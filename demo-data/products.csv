@@ -1,5 +1,0 @@
-id,style_code,brand,name,category,gender,supplier_id,cost_price,retail_price,status,created_at,updated_at
-1,SW-RUN1,Stridewell,"Velocity Runner",running,men,1,48.0,110.0,active,"2026-11-21 21:28:36","2026-11-21 21:28:36"
-2,SW-CAS2,Stridewell,"Daily Canvas Low",casual,unisex,1,18.0,45.0,active,"2026-11-21 21:28:36","2026-11-21 21:28:36"
-3,TF-BOOT3,Trailforge,"Ridge Hiker Boot",boots,women,2,70.0,165.0,active,"2026-11-21 21:28:36","2026-11-21 21:28:36"
-4,TF-SAN4,Trailforge,"Creek Sport Sandal",sandals,unisex,2,15.0,39.0,active,"2026-11-21 21:28:36","2026-11-21 21:28:36"
