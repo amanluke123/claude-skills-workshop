@@ -1,0 +1,3 @@
+id,po_number,supplier_id,status,expected_date,notes,created_at,updated_at
+1,PO-20261121-001,1,partial,2026-12-01,"Auto-generated from reorder alerts","2026-11-21 21:28:46","2026-11-21 21:28:46"
+2,PO-20261121-002,2,draft,2026-12-12,"Auto-generated from reorder alerts","2026-11-21 21:28:46","2026-11-21 21:28:46"

@@ -1,0 +1,580 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE suppliers (
+    id              INTEGER PRIMARY KEY,
+    name            TEXT NOT NULL UNIQUE,
+    contact_email   TEXT,
+    phone           TEXT,
+    lead_time_days  INTEGER NOT NULL DEFAULT 14,
+    notes           TEXT,
+    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+INSERT INTO suppliers VALUES(1,'Stridewell Footwear Co','orders@stridewell.example',NULL,10,NULL,'2026-11-21 21:28:36');
+INSERT INTO suppliers VALUES(2,'Trailforge Supply','po@trailforge.example',NULL,21,NULL,'2026-11-21 21:28:36');
+CREATE TABLE products (
+    id            INTEGER PRIMARY KEY,
+    style_code    TEXT NOT NULL UNIQUE,
+    brand         TEXT NOT NULL,
+    name          TEXT NOT NULL,
+    category      TEXT,
+    gender        TEXT,
+    supplier_id   INTEGER REFERENCES suppliers(id) ON DELETE SET NULL,
+    cost_price    REAL NOT NULL DEFAULT 0,
+    retail_price  REAL NOT NULL DEFAULT 0,
+    status        TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
+    created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at    TEXT NOT NULL DEFAULT (datetime('now'))
+);
+INSERT INTO products VALUES(1,'SW-RUN1','Stridewell','Velocity Runner','running','men',1,48.0,110.0,'active','2026-11-21 21:28:36','2026-11-21 21:28:36');
+INSERT INTO products VALUES(2,'SW-CAS2','Stridewell','Daily Canvas Low','casual','unisex',1,18.0,45.0,'active','2026-11-21 21:28:36','2026-11-21 21:28:36');
+INSERT INTO products VALUES(3,'TF-BOOT3','Trailforge','Ridge Hiker Boot','boots','women',2,70.0,165.0,'active','2026-11-21 21:28:36','2026-11-21 21:28:36');
+INSERT INTO products VALUES(4,'TF-SAN4','Trailforge','Creek Sport Sandal','sandals','unisex',2,15.0,39.0,'active','2026-11-21 21:28:36','2026-11-21 21:28:36');
+CREATE TABLE variants (
+    id             INTEGER PRIMARY KEY,
+    product_id     INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    sku            TEXT NOT NULL UNIQUE,
+    size           TEXT NOT NULL,
+    color          TEXT NOT NULL DEFAULT '',
+    width          TEXT NOT NULL DEFAULT 'M',
+    barcode        TEXT UNIQUE,
+    location       TEXT,
+    qty_on_hand    INTEGER NOT NULL DEFAULT 0,
+    reorder_point  INTEGER NOT NULL DEFAULT 3,
+    reorder_qty    INTEGER NOT NULL DEFAULT 6,
+    cost_price     REAL,
+    retail_price   REAL,
+    status         TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','archived')),
+    created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at     TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (product_id, size, color, width)
+);
+INSERT INTO variants VALUES(1,1,'SW-RUN1-BLA-8','8','Black','M',NULL,'A1-01',11,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-17 16:28:36');
+INSERT INTO variants VALUES(2,1,'SW-RUN1-BLA-8.5','8.5','Black','M',NULL,'A1-02',5,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-01 11:28:36');
+INSERT INTO variants VALUES(3,1,'SW-RUN1-BLA-9','9','Black','M',NULL,'A1-03',7,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 21:28:46');
+INSERT INTO variants VALUES(4,1,'SW-RUN1-BLA-9.5','9.5','Black','M',NULL,'A1-04',3,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-18 14:28:36');
+INSERT INTO variants VALUES(5,1,'SW-RUN1-BLA-10','10','Black','M',NULL,'A1-05',0,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 21:34:25');
+INSERT INTO variants VALUES(6,1,'SW-RUN1-BLA-10.5','10.5','Black','M',NULL,'A1-06',6,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-16 06:28:36');
+INSERT INTO variants VALUES(7,1,'SW-RUN1-BLA-11','11','Black','M',NULL,'A1-07',5,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-17 16:28:36');
+INSERT INTO variants VALUES(8,1,'SW-RUN1-BLA-12','12','Black','M',NULL,'A1-08',2,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-18 14:28:36');
+INSERT INTO variants VALUES(9,1,'SW-RUN1-BLU-8','8','Blue','M',NULL,'A1-01',14,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-13 09:28:36');
+INSERT INTO variants VALUES(10,1,'SW-RUN1-BLU-8.5','8.5','Blue','M',NULL,'A1-02',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-20 06:28:36');
+INSERT INTO variants VALUES(11,1,'SW-RUN1-BLU-9','9','Blue','M',NULL,'A1-03',2,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-13 16:28:36');
+INSERT INTO variants VALUES(12,1,'SW-RUN1-BLU-9.5','9.5','Blue','M',NULL,'A1-04',7,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-17 16:28:36');
+INSERT INTO variants VALUES(13,1,'SW-RUN1-BLU-10','10','Blue','M',NULL,'A1-05',6,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 16:28:36');
+INSERT INTO variants VALUES(14,1,'SW-RUN1-BLU-10.5','10.5','Blue','M',NULL,'A1-06',0,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-02 13:28:36');
+INSERT INTO variants VALUES(15,1,'SW-RUN1-BLU-11','11','Blue','M',NULL,'A1-07',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 21:28:46');
+INSERT INTO variants VALUES(16,1,'SW-RUN1-BLU-12','12','Blue','M',NULL,'A1-08',2,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-07 12:28:36');
+INSERT INTO variants VALUES(17,2,'SW-CAS2-WHI-6','6','White','M',NULL,'A1-01',4,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-20 06:28:36');
+INSERT INTO variants VALUES(18,2,'SW-CAS2-WHI-7','7','White','M',NULL,'A1-02',7,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-14 06:28:36');
+INSERT INTO variants VALUES(19,2,'SW-CAS2-WHI-8','8','White','M',NULL,'A1-03',8,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-15 11:28:36');
+INSERT INTO variants VALUES(20,2,'SW-CAS2-WHI-9','9','White','M',NULL,'A1-04',15,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 21:28:46');
+INSERT INTO variants VALUES(21,2,'SW-CAS2-WHI-10','10','White','M',NULL,'A1-05',3,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-15 11:28:36');
+INSERT INTO variants VALUES(22,2,'SW-CAS2-WHI-11','11','White','M',NULL,'A1-06',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-29 08:28:36');
+INSERT INTO variants VALUES(23,2,'SW-CAS2-NAV-6','6','Navy','M',NULL,'A1-01',3,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-04 15:28:36');
+INSERT INTO variants VALUES(24,2,'SW-CAS2-NAV-7','7','Navy','M',NULL,'A1-02',11,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-12 08:28:36');
+INSERT INTO variants VALUES(25,2,'SW-CAS2-NAV-8','8','Navy','M',NULL,'A1-03',11,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-14 06:28:36');
+INSERT INTO variants VALUES(26,2,'SW-CAS2-NAV-9','9','Navy','M',NULL,'A1-04',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-30 06:28:36');
+INSERT INTO variants VALUES(27,2,'SW-CAS2-NAV-10','10','Navy','M',NULL,'A1-05',7,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-06 08:28:36');
+INSERT INTO variants VALUES(28,2,'SW-CAS2-NAV-11','11','Navy','M',NULL,'A1-06',11,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-24 11:28:36');
+INSERT INTO variants VALUES(29,3,'TF-BOOT3-BRO-6','6','Brown','M',NULL,'A2-01',13,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 16:28:36');
+INSERT INTO variants VALUES(30,3,'TF-BOOT3-BRO-6.5','6.5','Brown','M',NULL,'A2-02',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-09-26 13:28:36');
+INSERT INTO variants VALUES(31,3,'TF-BOOT3-BRO-7','7','Brown','M',NULL,'A2-03',2,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-30 06:28:36');
+INSERT INTO variants VALUES(32,3,'TF-BOOT3-BRO-7.5','7.5','Brown','M',NULL,'A2-04',3,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-17 16:28:36');
+INSERT INTO variants VALUES(33,3,'TF-BOOT3-BRO-8','8','Brown','M',NULL,'A2-05',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 21:28:46');
+INSERT INTO variants VALUES(34,3,'TF-BOOT3-BRO-8.5','8.5','Brown','M',NULL,'A2-06',7,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-10 12:28:36');
+INSERT INTO variants VALUES(35,3,'TF-BOOT3-BRO-9','9','Brown','M',NULL,'A2-07',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-03 11:28:36');
+INSERT INTO variants VALUES(36,4,'TF-SAN4-GRE-5','5','Grey','M',NULL,'A2-01',7,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-08-29 06:28:36');
+INSERT INTO variants VALUES(37,4,'TF-SAN4-GRE-6','6','Grey','M',NULL,'A2-02',8,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-30 06:28:36');
+INSERT INTO variants VALUES(38,4,'TF-SAN4-GRE-7','7','Grey','M',NULL,'A2-03',4,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-19 14:28:36');
+INSERT INTO variants VALUES(39,4,'TF-SAN4-GRE-8','8','Grey','M',NULL,'A2-04',6,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 21:34:25');
+INSERT INTO variants VALUES(40,4,'TF-SAN4-GRE-9','9','Grey','M',NULL,'A2-05',5,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-20 06:28:36');
+INSERT INTO variants VALUES(41,4,'TF-SAN4-GRE-10','10','Grey','M',NULL,'A2-06',8,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 16:28:36');
+INSERT INTO variants VALUES(42,4,'TF-SAN4-GRE-11','11','Grey','M',NULL,'A2-07',3,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-20 15:28:36');
+INSERT INTO variants VALUES(43,4,'TF-SAN4-GRE-12','12','Grey','M',NULL,'A2-08',7,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 16:28:36');
+INSERT INTO variants VALUES(44,4,'TF-SAN4-GREEN-5','5','Green','M',NULL,'A2-01',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-11 11:28:36');
+INSERT INTO variants VALUES(45,4,'TF-SAN4-GREEN-6','6','Green','M',NULL,'A2-02',11,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-11 11:28:36');
+INSERT INTO variants VALUES(46,4,'TF-SAN4-GREEN-7','7','Green','M',NULL,'A2-03',7,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-09 07:28:36');
+INSERT INTO variants VALUES(47,4,'TF-SAN4-GREEN-8','8','Green','M',NULL,'A2-04',8,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-10-28 08:28:36');
+INSERT INTO variants VALUES(48,4,'TF-SAN4-GREEN-9','9','Green','M',NULL,'A2-05',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-21 16:28:36');
+INSERT INTO variants VALUES(49,4,'TF-SAN4-GREEN-10','10','Green','M',NULL,'A2-06',14,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-15 11:28:36');
+INSERT INTO variants VALUES(50,4,'TF-SAN4-GREEN-11','11','Green','M',NULL,'A2-07',1,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-15 11:28:36');
+INSERT INTO variants VALUES(51,4,'TF-SAN4-GREEN-12','12','Green','M',NULL,'A2-08',9,3,6,NULL,NULL,'active','2026-11-21 21:28:36','2026-11-11 11:28:36');
+CREATE TABLE stock_movements (
+    id             INTEGER PRIMARY KEY,
+    variant_id     INTEGER NOT NULL REFERENCES variants(id) ON DELETE CASCADE,
+    movement_type  TEXT NOT NULL CHECK (movement_type IN
+                   ('initial','receipt','sale','return','adjustment','damage','count')),
+    qty_change     INTEGER NOT NULL,
+    qty_after      INTEGER NOT NULL,
+    unit_cost      REAL,
+    unit_price     REAL,
+    reference      TEXT,
+    reason         TEXT,
+    created_at     TEXT NOT NULL DEFAULT (datetime('now'))
+);
+INSERT INTO stock_movements VALUES(1,1,'initial',16,16,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(2,2,'initial',7,7,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(3,3,'initial',6,6,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(4,4,'initial',10,10,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(5,5,'initial',9,9,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(6,6,'initial',9,9,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(7,7,'initial',8,8,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(8,8,'initial',7,7,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(9,9,'initial',16,16,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(10,10,'initial',14,14,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(11,11,'initial',7,7,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(12,12,'initial',15,15,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(13,13,'initial',12,12,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(14,14,'initial',6,6,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(15,15,'initial',6,6,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(16,16,'initial',7,7,48.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(17,17,'initial',9,9,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(18,18,'initial',9,9,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(19,19,'initial',14,14,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(20,20,'initial',15,15,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(21,21,'initial',6,6,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(22,22,'initial',14,14,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(23,23,'initial',9,9,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(24,24,'initial',16,16,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(25,25,'initial',14,14,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(26,26,'initial',12,12,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(27,27,'initial',9,9,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(28,28,'initial',13,13,18.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(29,29,'initial',15,15,70.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(30,30,'initial',10,10,70.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(31,31,'initial',6,6,70.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(32,32,'initial',8,8,70.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(33,33,'initial',12,12,70.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(34,34,'initial',11,11,70.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(35,35,'initial',10,10,70.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(36,36,'initial',8,8,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(37,37,'initial',9,9,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(38,38,'initial',11,11,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(39,39,'initial',7,7,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(40,40,'initial',7,7,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(41,41,'initial',12,12,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(42,42,'initial',7,7,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(43,43,'initial',11,11,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(44,44,'initial',11,11,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(45,45,'initial',15,15,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(46,46,'initial',10,10,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(47,47,'initial',6,6,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(48,48,'initial',13,13,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(49,49,'initial',14,14,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(50,50,'initial',7,7,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(51,51,'initial',12,12,15.0,NULL,'SEED',NULL,'2026-08-23 21:28:36');
+INSERT INTO stock_movements VALUES(52,7,'sale',-1,7,48.0,110.0,'POS-001',NULL,'2026-08-25 07:28:36');
+INSERT INTO stock_movements VALUES(53,11,'sale',-1,6,48.0,110.0,'POS-001',NULL,'2026-08-25 07:28:36');
+INSERT INTO stock_movements VALUES(54,31,'sale',-1,5,70.0,165.0,'POS-001',NULL,'2026-08-25 07:28:36');
+INSERT INTO stock_movements VALUES(55,13,'sale',-1,11,48.0,110.0,'POS-002',NULL,'2026-08-26 06:28:36');
+INSERT INTO stock_movements VALUES(56,19,'sale',-1,13,18.0,45.0,'POS-002',NULL,'2026-08-26 06:28:36');
+INSERT INTO stock_movements VALUES(57,12,'sale',-1,14,48.0,110.0,'POS-003',NULL,'2026-08-27 14:28:36');
+INSERT INTO stock_movements VALUES(58,22,'sale',-1,13,18.0,45.0,'POS-003',NULL,'2026-08-27 14:28:36');
+INSERT INTO stock_movements VALUES(59,4,'sale',-1,9,48.0,110.0,'POS-004',NULL,'2026-08-28 14:28:36');
+INSERT INTO stock_movements VALUES(60,12,'sale',-1,13,48.0,110.0,'POS-004',NULL,'2026-08-28 14:28:36');
+INSERT INTO stock_movements VALUES(61,25,'sale',-1,13,18.0,45.0,'POS-004',NULL,'2026-08-28 14:28:36');
+INSERT INTO stock_movements VALUES(62,26,'sale',-1,11,18.0,45.0,'POS-004',NULL,'2026-08-28 14:28:36');
+INSERT INTO stock_movements VALUES(63,39,'sale',-1,6,15.0,39.0,'POS-004',NULL,'2026-08-28 14:28:36');
+INSERT INTO stock_movements VALUES(64,4,'sale',-1,8,48.0,110.0,'POS-005',NULL,'2026-08-29 06:28:36');
+INSERT INTO stock_movements VALUES(65,16,'sale',-1,6,48.0,110.0,'POS-005',NULL,'2026-08-29 06:28:36');
+INSERT INTO stock_movements VALUES(66,36,'sale',-1,7,15.0,39.0,'POS-005',NULL,'2026-08-29 06:28:36');
+INSERT INTO stock_movements VALUES(67,42,'sale',-1,6,15.0,39.0,'POS-005',NULL,'2026-08-29 06:28:36');
+INSERT INTO stock_movements VALUES(68,4,'sale',-1,7,48.0,110.0,'POS-006',NULL,'2026-08-30 06:28:36');
+INSERT INTO stock_movements VALUES(69,14,'sale',-1,5,48.0,110.0,'POS-006',NULL,'2026-08-30 06:28:36');
+INSERT INTO stock_movements VALUES(70,31,'sale',-1,4,70.0,165.0,'POS-006',NULL,'2026-08-30 06:28:36');
+INSERT INTO stock_movements VALUES(71,3,'sale',-1,5,48.0,110.0,'POS-007',NULL,'2026-08-31 12:28:36');
+INSERT INTO stock_movements VALUES(72,51,'sale',-1,11,15.0,39.0,'POS-007',NULL,'2026-08-31 12:28:36');
+INSERT INTO stock_movements VALUES(73,10,'sale',-1,13,48.0,110.0,'POS-008',NULL,'2026-09-01 15:28:36');
+INSERT INTO stock_movements VALUES(74,12,'sale',-1,12,48.0,110.0,'POS-008',NULL,'2026-09-01 15:28:36');
+INSERT INTO stock_movements VALUES(75,16,'sale',-1,5,48.0,110.0,'POS-008',NULL,'2026-09-01 15:28:36');
+INSERT INTO stock_movements VALUES(76,40,'sale',-1,6,15.0,39.0,'POS-008',NULL,'2026-09-01 15:28:36');
+INSERT INTO stock_movements VALUES(77,48,'sale',-1,12,15.0,39.0,'POS-008',NULL,'2026-09-01 15:28:36');
+INSERT INTO stock_movements VALUES(78,4,'sale',-1,6,48.0,110.0,'POS-009',NULL,'2026-09-02 12:28:36');
+INSERT INTO stock_movements VALUES(79,48,'sale',-1,11,15.0,39.0,'POS-009',NULL,'2026-09-02 12:28:36');
+INSERT INTO stock_movements VALUES(80,49,'sale',-1,13,15.0,39.0,'POS-009',NULL,'2026-09-02 12:28:36');
+INSERT INTO stock_movements VALUES(81,49,'return',1,14,15.0,39.0,'RET-009','wrong size','2026-09-02 12:28:36');
+INSERT INTO stock_movements VALUES(82,14,'sale',-1,4,48.0,110.0,'POS-010',NULL,'2026-09-03 15:28:36');
+INSERT INTO stock_movements VALUES(83,14,'return',1,5,48.0,110.0,'RET-010','wrong size','2026-09-03 15:28:36');
+INSERT INTO stock_movements VALUES(84,20,'sale',-1,14,18.0,45.0,'POS-010',NULL,'2026-09-03 15:28:36');
+INSERT INTO stock_movements VALUES(85,26,'sale',-1,10,18.0,45.0,'POS-010',NULL,'2026-09-03 15:28:36');
+INSERT INTO stock_movements VALUES(86,25,'sale',-1,12,18.0,45.0,'POS-011',NULL,'2026-09-04 07:28:36');
+INSERT INTO stock_movements VALUES(87,2,'sale',-1,6,48.0,110.0,'POS-012',NULL,'2026-09-05 11:28:36');
+INSERT INTO stock_movements VALUES(88,15,'sale',-1,5,48.0,110.0,'POS-012',NULL,'2026-09-05 11:28:36');
+INSERT INTO stock_movements VALUES(89,19,'sale',-1,12,18.0,45.0,'POS-012',NULL,'2026-09-05 11:28:36');
+INSERT INTO stock_movements VALUES(90,20,'sale',-1,13,18.0,45.0,'POS-012',NULL,'2026-09-05 11:28:36');
+INSERT INTO stock_movements VALUES(91,45,'sale',-1,14,15.0,39.0,'POS-012',NULL,'2026-09-05 11:28:36');
+INSERT INTO stock_movements VALUES(92,12,'sale',-1,11,48.0,110.0,'POS-013',NULL,'2026-09-06 16:28:36');
+INSERT INTO stock_movements VALUES(93,27,'sale',-1,8,18.0,45.0,'POS-013',NULL,'2026-09-06 16:28:36');
+INSERT INTO stock_movements VALUES(94,31,'sale',-1,3,70.0,165.0,'POS-013',NULL,'2026-09-06 16:28:36');
+INSERT INTO stock_movements VALUES(95,4,'sale',-1,5,48.0,110.0,'POS-014',NULL,'2026-09-07 14:28:36');
+INSERT INTO stock_movements VALUES(96,7,'sale',-1,6,48.0,110.0,'POS-014',NULL,'2026-09-07 14:28:36');
+INSERT INTO stock_movements VALUES(97,14,'sale',-1,4,48.0,110.0,'POS-014',NULL,'2026-09-07 14:28:36');
+INSERT INTO stock_movements VALUES(98,19,'sale',-1,11,18.0,45.0,'POS-014',NULL,'2026-09-07 14:28:36');
+INSERT INTO stock_movements VALUES(99,23,'sale',-1,8,18.0,45.0,'POS-014',NULL,'2026-09-07 14:28:36');
+INSERT INTO stock_movements VALUES(100,26,'sale',-1,9,18.0,45.0,'POS-014',NULL,'2026-09-07 14:28:36');
+INSERT INTO stock_movements VALUES(101,41,'sale',-1,11,15.0,39.0,'POS-014',NULL,'2026-09-07 14:28:36');
+INSERT INTO stock_movements VALUES(102,46,'sale',-1,9,15.0,39.0,'POS-014',NULL,'2026-09-07 14:28:36');
+INSERT INTO stock_movements VALUES(103,11,'sale',-1,5,48.0,110.0,'POS-015',NULL,'2026-09-08 13:28:36');
+INSERT INTO stock_movements VALUES(104,19,'sale',-1,10,18.0,45.0,'POS-015',NULL,'2026-09-08 13:28:36');
+INSERT INTO stock_movements VALUES(105,43,'sale',-1,10,15.0,39.0,'POS-015',NULL,'2026-09-08 13:28:36');
+INSERT INTO stock_movements VALUES(106,3,'sale',-1,4,48.0,110.0,'POS-016',NULL,'2026-09-09 13:28:36');
+INSERT INTO stock_movements VALUES(107,4,'sale',-1,4,48.0,110.0,'POS-016',NULL,'2026-09-09 13:28:36');
+INSERT INTO stock_movements VALUES(108,39,'sale',-1,5,15.0,39.0,'POS-016',NULL,'2026-09-09 13:28:36');
+INSERT INTO stock_movements VALUES(109,41,'sale',-1,10,15.0,39.0,'POS-016',NULL,'2026-09-09 13:28:36');
+INSERT INTO stock_movements VALUES(110,13,'sale',-1,10,48.0,110.0,'POS-017',NULL,'2026-09-10 09:28:36');
+INSERT INTO stock_movements VALUES(111,39,'sale',-1,4,15.0,39.0,'POS-017',NULL,'2026-09-10 09:28:36');
+INSERT INTO stock_movements VALUES(112,48,'sale',-1,10,15.0,39.0,'POS-017',NULL,'2026-09-10 09:28:36');
+INSERT INTO stock_movements VALUES(113,5,'sale',-1,8,48.0,110.0,'POS-018',NULL,'2026-09-11 07:28:36');
+INSERT INTO stock_movements VALUES(114,6,'sale',-1,8,48.0,110.0,'POS-018',NULL,'2026-09-11 07:28:36');
+INSERT INTO stock_movements VALUES(115,41,'sale',-1,9,15.0,39.0,'POS-018',NULL,'2026-09-11 07:28:36');
+INSERT INTO stock_movements VALUES(116,1,'sale',-1,15,48.0,110.0,'POS-019',NULL,'2026-09-12 15:28:36');
+INSERT INTO stock_movements VALUES(117,7,'sale',-1,5,48.0,110.0,'POS-019',NULL,'2026-09-12 15:28:36');
+INSERT INTO stock_movements VALUES(118,7,'return',1,6,48.0,110.0,'RET-019','wrong size','2026-09-12 15:28:36');
+INSERT INTO stock_movements VALUES(119,12,'sale',-1,10,48.0,110.0,'POS-019',NULL,'2026-09-12 15:28:36');
+INSERT INTO stock_movements VALUES(120,21,'sale',-1,5,18.0,45.0,'POS-019',NULL,'2026-09-12 15:28:36');
+INSERT INTO stock_movements VALUES(121,26,'sale',-1,8,18.0,45.0,'POS-019',NULL,'2026-09-12 15:28:36');
+INSERT INTO stock_movements VALUES(122,11,'sale',-1,4,48.0,110.0,'POS-020',NULL,'2026-09-13 11:28:36');
+INSERT INTO stock_movements VALUES(123,14,'sale',-1,3,48.0,110.0,'POS-020',NULL,'2026-09-13 11:28:36');
+INSERT INTO stock_movements VALUES(124,26,'sale',-1,7,18.0,45.0,'POS-020',NULL,'2026-09-13 11:28:36');
+INSERT INTO stock_movements VALUES(125,3,'sale',-1,3,48.0,110.0,'POS-021',NULL,'2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(126,11,'sale',-1,3,48.0,110.0,'POS-021',NULL,'2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(127,27,'sale',-1,7,18.0,45.0,'POS-021',NULL,'2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(128,29,'sale',-1,14,70.0,165.0,'POS-021',NULL,'2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(129,34,'sale',-1,10,70.0,165.0,'POS-021',NULL,'2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(130,41,'sale',-1,8,15.0,39.0,'POS-021',NULL,'2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(131,42,'sale',-1,5,15.0,39.0,'POS-021',NULL,'2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(132,42,'return',1,6,15.0,39.0,'RET-021','wrong size','2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(133,50,'sale',-1,6,15.0,39.0,'POS-021',NULL,'2026-09-14 07:28:36');
+INSERT INTO stock_movements VALUES(134,5,'sale',-1,7,48.0,110.0,'POS-022',NULL,'2026-09-15 15:28:36');
+INSERT INTO stock_movements VALUES(135,7,'sale',-1,5,48.0,110.0,'POS-022',NULL,'2026-09-15 15:28:36');
+INSERT INTO stock_movements VALUES(136,11,'sale',-1,2,48.0,110.0,'POS-022',NULL,'2026-09-15 15:28:36');
+INSERT INTO stock_movements VALUES(137,45,'sale',-1,13,15.0,39.0,'POS-022',NULL,'2026-09-15 15:28:36');
+INSERT INTO stock_movements VALUES(138,49,'sale',-1,13,15.0,39.0,'POS-022',NULL,'2026-09-15 15:28:36');
+INSERT INTO stock_movements VALUES(139,7,'sale',-1,4,48.0,110.0,'POS-023',NULL,'2026-09-16 06:28:36');
+INSERT INTO stock_movements VALUES(140,25,'sale',-1,11,18.0,45.0,'POS-023',NULL,'2026-09-16 06:28:36');
+INSERT INTO stock_movements VALUES(141,1,'sale',-1,14,48.0,110.0,'POS-024',NULL,'2026-09-17 11:28:36');
+INSERT INTO stock_movements VALUES(142,24,'sale',-1,15,18.0,45.0,'POS-024',NULL,'2026-09-17 11:28:36');
+INSERT INTO stock_movements VALUES(143,47,'sale',-1,5,15.0,39.0,'POS-024',NULL,'2026-09-17 11:28:36');
+INSERT INTO stock_movements VALUES(144,5,'sale',-1,6,48.0,110.0,'POS-025',NULL,'2026-09-18 07:28:36');
+INSERT INTO stock_movements VALUES(145,10,'sale',-1,12,48.0,110.0,'POS-025',NULL,'2026-09-18 07:28:36');
+INSERT INTO stock_movements VALUES(146,15,'sale',-1,4,48.0,110.0,'POS-025',NULL,'2026-09-18 07:28:36');
+INSERT INTO stock_movements VALUES(147,26,'sale',-1,6,18.0,45.0,'POS-025',NULL,'2026-09-18 07:28:36');
+INSERT INTO stock_movements VALUES(148,42,'sale',-1,5,15.0,39.0,'POS-025',NULL,'2026-09-18 07:28:36');
+INSERT INTO stock_movements VALUES(149,5,'sale',-1,5,48.0,110.0,'POS-026',NULL,'2026-09-19 07:28:36');
+INSERT INTO stock_movements VALUES(150,6,'sale',-1,7,48.0,110.0,'POS-026',NULL,'2026-09-19 07:28:36');
+INSERT INTO stock_movements VALUES(151,10,'sale',-1,11,48.0,110.0,'POS-026',NULL,'2026-09-19 07:28:36');
+INSERT INTO stock_movements VALUES(152,12,'sale',-1,9,48.0,110.0,'POS-026',NULL,'2026-09-19 07:28:36');
+INSERT INTO stock_movements VALUES(153,14,'sale',-1,2,48.0,110.0,'POS-026',NULL,'2026-09-19 07:28:36');
+INSERT INTO stock_movements VALUES(154,25,'sale',-1,10,18.0,45.0,'POS-026',NULL,'2026-09-19 07:28:36');
+INSERT INTO stock_movements VALUES(155,33,'sale',-1,11,70.0,165.0,'POS-026',NULL,'2026-09-19 07:28:36');
+INSERT INTO stock_movements VALUES(156,5,'sale',-1,4,48.0,110.0,'POS-027',NULL,'2026-09-20 12:28:36');
+INSERT INTO stock_movements VALUES(157,11,'sale',-1,1,48.0,110.0,'POS-027',NULL,'2026-09-20 12:28:36');
+INSERT INTO stock_movements VALUES(158,26,'sale',-1,5,18.0,45.0,'POS-027',NULL,'2026-09-20 12:28:36');
+INSERT INTO stock_movements VALUES(159,3,'sale',-1,2,48.0,110.0,'POS-028',NULL,'2026-09-21 13:28:36');
+INSERT INTO stock_movements VALUES(160,39,'sale',-1,3,15.0,39.0,'POS-028',NULL,'2026-09-21 13:28:36');
+INSERT INTO stock_movements VALUES(161,23,'sale',-1,7,18.0,45.0,'POS-029',NULL,'2026-09-22 08:28:36');
+INSERT INTO stock_movements VALUES(162,38,'sale',-1,10,15.0,39.0,'POS-029',NULL,'2026-09-22 08:28:36');
+INSERT INTO stock_movements VALUES(163,4,'sale',-1,3,48.0,110.0,'POS-030',NULL,'2026-09-23 13:28:36');
+INSERT INTO stock_movements VALUES(164,13,'sale',-1,9,48.0,110.0,'POS-030',NULL,'2026-09-23 13:28:36');
+INSERT INTO stock_movements VALUES(165,22,'sale',-1,12,18.0,45.0,'POS-030',NULL,'2026-09-23 13:28:36');
+INSERT INTO stock_movements VALUES(166,27,'sale',-1,6,18.0,45.0,'POS-030',NULL,'2026-09-23 13:28:36');
+INSERT INTO stock_movements VALUES(167,32,'sale',-1,7,70.0,165.0,'POS-030',NULL,'2026-09-23 13:28:36');
+INSERT INTO stock_movements VALUES(168,51,'sale',-1,10,15.0,39.0,'POS-030',NULL,'2026-09-23 13:28:36');
+INSERT INTO stock_movements VALUES(169,51,'return',1,11,15.0,39.0,'RET-030','wrong size','2026-09-23 13:28:36');
+INSERT INTO stock_movements VALUES(170,5,'sale',-1,3,48.0,110.0,'POS-031',NULL,'2026-09-24 11:28:36');
+INSERT INTO stock_movements VALUES(171,16,'sale',-1,4,48.0,110.0,'POS-031',NULL,'2026-09-24 11:28:36');
+INSERT INTO stock_movements VALUES(172,34,'sale',-1,9,70.0,165.0,'POS-032',NULL,'2026-09-25 16:28:36');
+INSERT INTO stock_movements VALUES(173,47,'sale',-1,4,15.0,39.0,'POS-032',NULL,'2026-09-25 16:28:36');
+INSERT INTO stock_movements VALUES(174,3,'sale',-1,1,48.0,110.0,'POS-033',NULL,'2026-09-26 13:28:36');
+INSERT INTO stock_movements VALUES(175,14,'sale',-1,1,48.0,110.0,'POS-033',NULL,'2026-09-26 13:28:36');
+INSERT INTO stock_movements VALUES(176,30,'sale',-1,9,70.0,165.0,'POS-033',NULL,'2026-09-26 13:28:36');
+INSERT INTO stock_movements VALUES(177,3,'sale',-1,0,48.0,110.0,'POS-034',NULL,'2026-09-27 12:28:36');
+INSERT INTO stock_movements VALUES(178,5,'sale',-1,2,48.0,110.0,'POS-034',NULL,'2026-09-27 12:28:36');
+INSERT INTO stock_movements VALUES(179,13,'sale',-1,8,48.0,110.0,'POS-034',NULL,'2026-09-27 12:28:36');
+INSERT INTO stock_movements VALUES(180,15,'sale',-1,3,48.0,110.0,'POS-034',NULL,'2026-09-27 12:28:36');
+INSERT INTO stock_movements VALUES(181,40,'sale',-1,5,15.0,39.0,'POS-034',NULL,'2026-09-27 12:28:36');
+INSERT INTO stock_movements VALUES(182,5,'sale',-1,1,48.0,110.0,'POS-035',NULL,'2026-09-28 09:28:36');
+INSERT INTO stock_movements VALUES(183,11,'sale',-1,0,48.0,110.0,'POS-035',NULL,'2026-09-28 09:28:36');
+INSERT INTO stock_movements VALUES(184,12,'sale',-1,8,48.0,110.0,'POS-035',NULL,'2026-09-28 09:28:36');
+INSERT INTO stock_movements VALUES(185,13,'sale',-1,7,48.0,110.0,'POS-035',NULL,'2026-09-28 09:28:36');
+INSERT INTO stock_movements VALUES(186,16,'sale',-1,3,48.0,110.0,'POS-035',NULL,'2026-09-28 09:28:36');
+INSERT INTO stock_movements VALUES(187,1,'sale',-1,13,48.0,110.0,'POS-036',NULL,'2026-09-29 07:28:36');
+INSERT INTO stock_movements VALUES(188,6,'sale',-1,6,48.0,110.0,'POS-036',NULL,'2026-09-29 07:28:36');
+INSERT INTO stock_movements VALUES(189,24,'sale',-1,14,18.0,45.0,'POS-037',NULL,'2026-09-30 12:28:36');
+INSERT INTO stock_movements VALUES(190,26,'sale',-1,4,18.0,45.0,'POS-037',NULL,'2026-09-30 12:28:36');
+INSERT INTO stock_movements VALUES(191,40,'sale',-1,4,15.0,39.0,'POS-037',NULL,'2026-09-30 12:28:36');
+INSERT INTO stock_movements VALUES(192,26,'sale',-1,3,18.0,45.0,'POS-038',NULL,'2026-10-01 12:28:36');
+INSERT INTO stock_movements VALUES(193,26,'return',1,4,18.0,45.0,'RET-038','wrong size','2026-10-01 12:28:36');
+INSERT INTO stock_movements VALUES(194,38,'sale',-1,9,15.0,39.0,'POS-038',NULL,'2026-10-01 12:28:36');
+INSERT INTO stock_movements VALUES(195,40,'sale',-1,3,15.0,39.0,'POS-038',NULL,'2026-10-01 12:28:36');
+INSERT INTO stock_movements VALUES(196,14,'sale',-1,0,48.0,110.0,'POS-039',NULL,'2026-10-02 10:28:36');
+INSERT INTO stock_movements VALUES(197,16,'sale',-1,2,48.0,110.0,'POS-039',NULL,'2026-10-02 10:28:36');
+INSERT INTO stock_movements VALUES(198,16,'return',1,3,48.0,110.0,'RET-039','wrong size','2026-10-02 10:28:36');
+INSERT INTO stock_movements VALUES(199,25,'sale',-1,9,18.0,45.0,'POS-039',NULL,'2026-10-02 10:28:36');
+INSERT INTO stock_movements VALUES(200,34,'sale',-1,8,70.0,165.0,'POS-039',NULL,'2026-10-02 10:28:36');
+INSERT INTO stock_movements VALUES(201,41,'sale',-1,7,15.0,39.0,'POS-039',NULL,'2026-10-02 10:28:36');
+INSERT INTO stock_movements VALUES(202,9,'sale',-1,15,48.0,110.0,'POS-040',NULL,'2026-10-03 11:28:36');
+INSERT INTO stock_movements VALUES(203,21,'sale',-1,4,18.0,45.0,'POS-040',NULL,'2026-10-03 11:28:36');
+INSERT INTO stock_movements VALUES(204,26,'sale',-1,3,18.0,45.0,'POS-040',NULL,'2026-10-03 11:28:36');
+INSERT INTO stock_movements VALUES(205,26,'return',1,4,18.0,45.0,'RET-040','wrong size','2026-10-03 11:28:36');
+INSERT INTO stock_movements VALUES(206,35,'sale',-1,9,70.0,165.0,'POS-040',NULL,'2026-10-03 11:28:36');
+INSERT INTO stock_movements VALUES(207,12,'sale',-1,7,48.0,110.0,'POS-041',NULL,'2026-10-04 07:28:36');
+INSERT INTO stock_movements VALUES(208,41,'sale',-1,6,15.0,39.0,'POS-041',NULL,'2026-10-04 07:28:36');
+INSERT INTO stock_movements VALUES(209,46,'sale',-1,8,15.0,39.0,'POS-041',NULL,'2026-10-04 07:28:36');
+INSERT INTO stock_movements VALUES(210,21,'sale',-1,3,18.0,45.0,'POS-042',NULL,'2026-10-05 08:28:36');
+INSERT INTO stock_movements VALUES(211,27,'sale',-1,5,18.0,45.0,'POS-042',NULL,'2026-10-05 08:28:36');
+INSERT INTO stock_movements VALUES(212,38,'sale',-1,8,15.0,39.0,'POS-042',NULL,'2026-10-05 08:28:36');
+INSERT INTO stock_movements VALUES(213,5,'sale',-1,0,48.0,110.0,'POS-043',NULL,'2026-10-06 10:28:36');
+INSERT INTO stock_movements VALUES(214,22,'sale',-1,11,18.0,45.0,'POS-043',NULL,'2026-10-06 10:28:36');
+INSERT INTO stock_movements VALUES(215,16,'sale',-1,2,48.0,110.0,'POS-044',NULL,'2026-10-07 12:28:36');
+INSERT INTO stock_movements VALUES(216,25,'sale',-1,8,18.0,45.0,'POS-044',NULL,'2026-10-07 12:28:36');
+INSERT INTO stock_movements VALUES(217,25,'return',1,9,18.0,45.0,'RET-044','wrong size','2026-10-07 12:28:36');
+INSERT INTO stock_movements VALUES(218,41,'sale',-1,5,15.0,39.0,'POS-044',NULL,'2026-10-07 12:28:36');
+INSERT INTO stock_movements VALUES(219,3,'receipt',6,6,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(220,4,'receipt',6,9,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(221,5,'receipt',6,6,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(222,6,'receipt',6,12,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(223,7,'receipt',6,10,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(224,11,'receipt',6,6,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(225,12,'receipt',6,13,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(226,13,'receipt',6,13,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(227,14,'receipt',6,6,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(228,15,'receipt',6,9,48.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(229,19,'receipt',6,16,18.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(230,20,'receipt',6,19,18.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(231,21,'receipt',6,9,18.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(232,25,'receipt',6,15,18.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(233,26,'receipt',6,10,18.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(234,27,'receipt',6,11,18.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(235,28,'sale',-1,12,18.0,45.0,'POS-045',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(236,39,'receipt',6,9,15.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(237,40,'receipt',6,9,15.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(238,41,'sale',-1,4,15.0,39.0,'POS-045',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(239,41,'receipt',6,10,15.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(240,47,'receipt',6,10,15.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(241,48,'receipt',6,16,15.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(242,49,'receipt',6,19,15.0,NULL,'PO-SEED-1',NULL,'2026-10-08 13:28:36');
+INSERT INTO stock_movements VALUES(243,5,'sale',-1,5,48.0,110.0,'POS-046',NULL,'2026-10-09 07:28:36');
+INSERT INTO stock_movements VALUES(244,17,'sale',-1,8,18.0,45.0,'POS-046',NULL,'2026-10-09 07:28:36');
+INSERT INTO stock_movements VALUES(245,23,'sale',-1,6,18.0,45.0,'POS-046',NULL,'2026-10-09 07:28:36');
+INSERT INTO stock_movements VALUES(246,42,'sale',-1,4,15.0,39.0,'POS-046',NULL,'2026-10-09 07:28:36');
+INSERT INTO stock_movements VALUES(247,46,'sale',-1,7,15.0,39.0,'POS-046',NULL,'2026-10-09 07:28:36');
+INSERT INTO stock_movements VALUES(248,11,'sale',-1,5,48.0,110.0,'POS-047',NULL,'2026-10-10 12:28:36');
+INSERT INTO stock_movements VALUES(249,13,'sale',-1,12,48.0,110.0,'POS-047',NULL,'2026-10-10 12:28:36');
+INSERT INTO stock_movements VALUES(250,34,'sale',-1,7,70.0,165.0,'POS-047',NULL,'2026-10-10 12:28:36');
+INSERT INTO stock_movements VALUES(251,47,'sale',-1,9,15.0,39.0,'POS-047',NULL,'2026-10-10 12:28:36');
+INSERT INTO stock_movements VALUES(252,48,'sale',-1,15,15.0,39.0,'POS-047',NULL,'2026-10-10 12:28:36');
+INSERT INTO stock_movements VALUES(253,6,'sale',-1,11,48.0,110.0,'POS-048',NULL,'2026-10-11 12:28:36');
+INSERT INTO stock_movements VALUES(254,8,'sale',-1,6,48.0,110.0,'POS-048',NULL,'2026-10-11 12:28:36');
+INSERT INTO stock_movements VALUES(255,15,'sale',-1,8,48.0,110.0,'POS-048',NULL,'2026-10-11 12:28:36');
+INSERT INTO stock_movements VALUES(256,27,'sale',-1,10,18.0,45.0,'POS-048',NULL,'2026-10-11 12:28:36');
+INSERT INTO stock_movements VALUES(257,18,'sale',-1,8,18.0,45.0,'POS-049',NULL,'2026-10-12 06:28:36');
+INSERT INTO stock_movements VALUES(258,19,'sale',-1,15,18.0,45.0,'POS-049',NULL,'2026-10-12 06:28:36');
+INSERT INTO stock_movements VALUES(259,24,'sale',-1,13,18.0,45.0,'POS-049',NULL,'2026-10-12 06:28:36');
+INSERT INTO stock_movements VALUES(260,38,'sale',-1,7,15.0,39.0,'POS-049',NULL,'2026-10-12 06:28:36');
+INSERT INTO stock_movements VALUES(261,6,'sale',-1,10,48.0,110.0,'POS-050',NULL,'2026-10-13 09:28:36');
+INSERT INTO stock_movements VALUES(262,9,'sale',-1,14,48.0,110.0,'POS-050',NULL,'2026-10-13 09:28:36');
+INSERT INTO stock_movements VALUES(263,21,'sale',-1,8,18.0,45.0,'POS-050',NULL,'2026-10-13 09:28:36');
+INSERT INTO stock_movements VALUES(264,4,'sale',-1,8,48.0,110.0,'POS-051',NULL,'2026-10-14 09:28:36');
+INSERT INTO stock_movements VALUES(265,14,'sale',-1,5,48.0,110.0,'POS-051',NULL,'2026-10-14 09:28:36');
+INSERT INTO stock_movements VALUES(266,21,'sale',-1,7,18.0,45.0,'POS-051',NULL,'2026-10-14 09:28:36');
+INSERT INTO stock_movements VALUES(267,24,'sale',-1,12,18.0,45.0,'POS-051',NULL,'2026-10-14 09:28:36');
+INSERT INTO stock_movements VALUES(268,3,'sale',-1,5,48.0,110.0,'POS-052',NULL,'2026-10-15 10:28:36');
+INSERT INTO stock_movements VALUES(269,8,'sale',-1,5,48.0,110.0,'POS-052',NULL,'2026-10-15 10:28:36');
+INSERT INTO stock_movements VALUES(270,40,'sale',-1,8,15.0,39.0,'POS-052',NULL,'2026-10-15 10:28:36');
+INSERT INTO stock_movements VALUES(271,11,'sale',-1,4,48.0,110.0,'POS-053',NULL,'2026-10-16 06:28:36');
+INSERT INTO stock_movements VALUES(272,13,'sale',-1,11,48.0,110.0,'POS-053',NULL,'2026-10-16 06:28:36');
+INSERT INTO stock_movements VALUES(273,21,'sale',-1,6,18.0,45.0,'POS-053',NULL,'2026-10-16 06:28:36');
+INSERT INTO stock_movements VALUES(274,27,'sale',-1,9,18.0,45.0,'POS-053',NULL,'2026-10-16 06:28:36');
+INSERT INTO stock_movements VALUES(275,49,'sale',-1,18,15.0,39.0,'POS-053',NULL,'2026-10-16 06:28:36');
+INSERT INTO stock_movements VALUES(276,1,'sale',-1,12,48.0,110.0,'POS-054',NULL,'2026-10-17 15:28:36');
+INSERT INTO stock_movements VALUES(277,13,'sale',-1,10,48.0,110.0,'POS-054',NULL,'2026-10-17 15:28:36');
+INSERT INTO stock_movements VALUES(278,19,'sale',-1,14,18.0,45.0,'POS-054',NULL,'2026-10-17 15:28:36');
+INSERT INTO stock_movements VALUES(279,20,'sale',-1,18,18.0,45.0,'POS-054',NULL,'2026-10-17 15:28:36');
+INSERT INTO stock_movements VALUES(280,20,'return',1,19,18.0,45.0,'RET-054','wrong size','2026-10-17 15:28:36');
+INSERT INTO stock_movements VALUES(281,39,'sale',-1,8,15.0,39.0,'POS-054',NULL,'2026-10-17 15:28:36');
+INSERT INTO stock_movements VALUES(282,48,'sale',-1,14,15.0,39.0,'POS-054',NULL,'2026-10-17 15:28:36');
+INSERT INTO stock_movements VALUES(283,13,'sale',-1,9,48.0,110.0,'POS-055',NULL,'2026-10-18 07:28:36');
+INSERT INTO stock_movements VALUES(284,13,'return',1,10,48.0,110.0,'RET-055','wrong size','2026-10-18 07:28:36');
+INSERT INTO stock_movements VALUES(285,14,'sale',-1,4,48.0,110.0,'POS-055',NULL,'2026-10-18 07:28:36');
+INSERT INTO stock_movements VALUES(286,32,'sale',-1,6,70.0,165.0,'POS-055',NULL,'2026-10-18 07:28:36');
+INSERT INTO stock_movements VALUES(287,25,'sale',-1,14,18.0,45.0,'POS-056',NULL,'2026-10-19 10:28:36');
+INSERT INTO stock_movements VALUES(288,50,'sale',-1,5,15.0,39.0,'POS-056',NULL,'2026-10-19 10:28:36');
+INSERT INTO stock_movements VALUES(289,6,'sale',-1,9,48.0,110.0,'POS-057',NULL,'2026-10-20 15:28:36');
+INSERT INTO stock_movements VALUES(290,41,'sale',-1,9,15.0,39.0,'POS-057',NULL,'2026-10-20 15:28:36');
+INSERT INTO stock_movements VALUES(291,41,'return',1,10,15.0,39.0,'RET-057','wrong size','2026-10-20 15:28:36');
+INSERT INTO stock_movements VALUES(292,42,'sale',-1,3,15.0,39.0,'POS-057',NULL,'2026-10-20 15:28:36');
+INSERT INTO stock_movements VALUES(293,17,'sale',-1,7,18.0,45.0,'POS-058',NULL,'2026-10-21 13:28:36');
+INSERT INTO stock_movements VALUES(294,19,'sale',-1,13,18.0,45.0,'POS-058',NULL,'2026-10-21 13:28:36');
+INSERT INTO stock_movements VALUES(295,22,'sale',-1,10,18.0,45.0,'POS-058',NULL,'2026-10-21 13:28:36');
+INSERT INTO stock_movements VALUES(296,3,'sale',-1,4,48.0,110.0,'POS-059',NULL,'2026-10-22 08:28:36');
+INSERT INTO stock_movements VALUES(297,8,'sale',-1,4,48.0,110.0,'POS-059',NULL,'2026-10-22 08:28:36');
+INSERT INTO stock_movements VALUES(298,3,'sale',-1,3,48.0,110.0,'POS-060',NULL,'2026-10-23 16:28:36');
+INSERT INTO stock_movements VALUES(299,17,'sale',-1,6,18.0,45.0,'POS-060',NULL,'2026-10-23 16:28:36');
+INSERT INTO stock_movements VALUES(300,32,'sale',-1,5,70.0,165.0,'POS-060',NULL,'2026-10-23 16:28:36');
+INSERT INTO stock_movements VALUES(301,4,'damage',-1,7,48.0,NULL,NULL,'scuffed display pair','2026-10-23 16:28:36');
+INSERT INTO stock_movements VALUES(302,7,'sale',-1,9,48.0,110.0,'POS-061',NULL,'2026-10-24 11:28:36');
+INSERT INTO stock_movements VALUES(303,10,'sale',-1,10,48.0,110.0,'POS-061',NULL,'2026-10-24 11:28:36');
+INSERT INTO stock_movements VALUES(304,19,'sale',-1,12,18.0,45.0,'POS-061',NULL,'2026-10-24 11:28:36');
+INSERT INTO stock_movements VALUES(305,21,'sale',-1,5,18.0,45.0,'POS-061',NULL,'2026-10-24 11:28:36');
+INSERT INTO stock_movements VALUES(306,28,'sale',-1,11,18.0,45.0,'POS-061',NULL,'2026-10-24 11:28:36');
+INSERT INTO stock_movements VALUES(307,5,'sale',-1,4,48.0,110.0,'POS-062',NULL,'2026-10-25 06:28:36');
+INSERT INTO stock_movements VALUES(308,14,'sale',-1,3,48.0,110.0,'POS-062',NULL,'2026-10-25 06:28:36');
+INSERT INTO stock_movements VALUES(309,15,'sale',-1,7,48.0,110.0,'POS-062',NULL,'2026-10-25 06:28:36');
+INSERT INTO stock_movements VALUES(310,19,'sale',-1,11,18.0,45.0,'POS-062',NULL,'2026-10-25 06:28:36');
+INSERT INTO stock_movements VALUES(311,20,'sale',-1,18,18.0,45.0,'POS-062',NULL,'2026-10-25 06:28:36');
+INSERT INTO stock_movements VALUES(312,27,'sale',-1,8,18.0,45.0,'POS-062',NULL,'2026-10-25 06:28:36');
+INSERT INTO stock_movements VALUES(313,39,'sale',-1,7,15.0,39.0,'POS-062',NULL,'2026-10-25 06:28:36');
+INSERT INTO stock_movements VALUES(314,48,'sale',-1,13,15.0,39.0,'POS-062',NULL,'2026-10-25 06:28:36');
+INSERT INTO stock_movements VALUES(315,3,'sale',-1,2,48.0,110.0,'POS-063',NULL,'2026-10-26 13:28:36');
+INSERT INTO stock_movements VALUES(316,15,'sale',-1,6,48.0,110.0,'POS-063',NULL,'2026-10-26 13:28:36');
+INSERT INTO stock_movements VALUES(317,33,'sale',-1,10,70.0,165.0,'POS-063',NULL,'2026-10-26 13:28:36');
+INSERT INTO stock_movements VALUES(318,48,'sale',-1,12,15.0,39.0,'POS-063',NULL,'2026-10-26 13:28:36');
+INSERT INTO stock_movements VALUES(319,14,'sale',-1,2,48.0,110.0,'POS-064',NULL,'2026-10-27 14:28:36');
+INSERT INTO stock_movements VALUES(320,15,'sale',-1,5,48.0,110.0,'POS-064',NULL,'2026-10-27 14:28:36');
+INSERT INTO stock_movements VALUES(321,20,'sale',-1,17,18.0,45.0,'POS-064',NULL,'2026-10-27 14:28:36');
+INSERT INTO stock_movements VALUES(322,43,'sale',-1,9,15.0,39.0,'POS-064',NULL,'2026-10-27 14:28:36');
+INSERT INTO stock_movements VALUES(323,45,'sale',-1,12,15.0,39.0,'POS-065',NULL,'2026-10-28 08:28:36');
+INSERT INTO stock_movements VALUES(324,47,'sale',-1,8,15.0,39.0,'POS-065',NULL,'2026-10-28 08:28:36');
+INSERT INTO stock_movements VALUES(325,5,'sale',-1,3,48.0,110.0,'POS-066',NULL,'2026-10-29 08:28:36');
+INSERT INTO stock_movements VALUES(326,6,'sale',-1,8,48.0,110.0,'POS-066',NULL,'2026-10-29 08:28:36');
+INSERT INTO stock_movements VALUES(327,22,'sale',-1,9,18.0,45.0,'POS-066',NULL,'2026-10-29 08:28:36');
+INSERT INTO stock_movements VALUES(328,7,'sale',-1,8,48.0,110.0,'POS-067',NULL,'2026-10-30 06:28:36');
+INSERT INTO stock_movements VALUES(329,26,'sale',-1,9,18.0,45.0,'POS-067',NULL,'2026-10-30 06:28:36');
+INSERT INTO stock_movements VALUES(330,31,'sale',-1,2,70.0,165.0,'POS-067',NULL,'2026-10-30 06:28:36');
+INSERT INTO stock_movements VALUES(331,37,'sale',-1,8,15.0,39.0,'POS-067',NULL,'2026-10-30 06:28:36');
+INSERT INTO stock_movements VALUES(332,4,'sale',-1,6,48.0,110.0,'POS-068',NULL,'2026-10-31 16:28:36');
+INSERT INTO stock_movements VALUES(333,14,'sale',-1,1,48.0,110.0,'POS-068',NULL,'2026-10-31 16:28:36');
+INSERT INTO stock_movements VALUES(334,23,'sale',-1,5,18.0,45.0,'POS-068',NULL,'2026-10-31 16:28:36');
+INSERT INTO stock_movements VALUES(335,2,'sale',-1,5,48.0,110.0,'POS-069',NULL,'2026-11-01 11:28:36');
+INSERT INTO stock_movements VALUES(336,4,'sale',-1,5,48.0,110.0,'POS-069',NULL,'2026-11-01 11:28:36');
+INSERT INTO stock_movements VALUES(337,7,'sale',-1,7,48.0,110.0,'POS-069',NULL,'2026-11-01 11:28:36');
+INSERT INTO stock_movements VALUES(338,13,'sale',-1,9,48.0,110.0,'POS-069',NULL,'2026-11-01 11:28:36');
+INSERT INTO stock_movements VALUES(339,19,'sale',-1,10,18.0,45.0,'POS-069',NULL,'2026-11-01 11:28:36');
+INSERT INTO stock_movements VALUES(340,13,'sale',-1,8,48.0,110.0,'POS-070',NULL,'2026-11-02 13:28:36');
+INSERT INTO stock_movements VALUES(341,14,'sale',-1,0,48.0,110.0,'POS-070',NULL,'2026-11-02 13:28:36');
+INSERT INTO stock_movements VALUES(342,15,'sale',-1,4,48.0,110.0,'POS-070',NULL,'2026-11-02 13:28:36');
+INSERT INTO stock_movements VALUES(343,49,'sale',-1,17,15.0,39.0,'POS-070',NULL,'2026-11-02 13:28:36');
+INSERT INTO stock_movements VALUES(344,50,'sale',-1,4,15.0,39.0,'POS-070',NULL,'2026-11-02 13:28:36');
+INSERT INTO stock_movements VALUES(345,4,'sale',-1,4,48.0,110.0,'POS-071',NULL,'2026-11-03 11:28:36');
+INSERT INTO stock_movements VALUES(346,5,'sale',-1,2,48.0,110.0,'POS-071',NULL,'2026-11-03 11:28:36');
+INSERT INTO stock_movements VALUES(347,15,'sale',-1,3,48.0,110.0,'POS-071',NULL,'2026-11-03 11:28:36');
+INSERT INTO stock_movements VALUES(348,23,'sale',-1,4,18.0,45.0,'POS-071',NULL,'2026-11-03 11:28:36');
+INSERT INTO stock_movements VALUES(349,21,'sale',-1,4,18.0,45.0,'POS-072',NULL,'2026-11-04 15:28:36');
+INSERT INTO stock_movements VALUES(350,23,'sale',-1,3,18.0,45.0,'POS-072',NULL,'2026-11-04 15:28:36');
+INSERT INTO stock_movements VALUES(351,38,'sale',-1,6,15.0,39.0,'POS-072',NULL,'2026-11-04 15:28:36');
+INSERT INTO stock_movements VALUES(352,13,'sale',-1,7,48.0,110.0,'POS-073',NULL,'2026-11-05 15:28:36');
+INSERT INTO stock_movements VALUES(353,13,'return',1,8,48.0,110.0,'RET-073','wrong size','2026-11-05 15:28:36');
+INSERT INTO stock_movements VALUES(354,51,'sale',-1,10,15.0,39.0,'POS-073',NULL,'2026-11-05 15:28:36');
+INSERT INTO stock_movements VALUES(355,3,'sale',-1,1,48.0,110.0,'POS-074',NULL,'2026-11-06 08:28:36');
+INSERT INTO stock_movements VALUES(356,12,'sale',-1,12,48.0,110.0,'POS-074',NULL,'2026-11-06 08:28:36');
+INSERT INTO stock_movements VALUES(357,15,'sale',-1,2,48.0,110.0,'POS-074',NULL,'2026-11-06 08:28:36');
+INSERT INTO stock_movements VALUES(358,27,'sale',-1,7,18.0,45.0,'POS-074',NULL,'2026-11-06 08:28:36');
+INSERT INTO stock_movements VALUES(359,32,'sale',-1,4,70.0,165.0,'POS-074',NULL,'2026-11-06 08:28:36');
+INSERT INTO stock_movements VALUES(360,44,'sale',-1,10,15.0,39.0,'POS-074',NULL,'2026-11-06 08:28:36');
+INSERT INTO stock_movements VALUES(361,12,'sale',-1,11,48.0,110.0,'POS-075',NULL,'2026-11-07 14:28:36');
+INSERT INTO stock_movements VALUES(362,13,'sale',-1,7,48.0,110.0,'POS-075',NULL,'2026-11-07 14:28:36');
+INSERT INTO stock_movements VALUES(363,20,'sale',-1,16,18.0,45.0,'POS-075',NULL,'2026-11-07 14:28:36');
+INSERT INTO stock_movements VALUES(364,25,'sale',-1,13,18.0,45.0,'POS-075',NULL,'2026-11-07 14:28:36');
+INSERT INTO stock_movements VALUES(365,49,'sale',-1,16,15.0,39.0,'POS-075',NULL,'2026-11-07 14:28:36');
+INSERT INTO stock_movements VALUES(366,8,'sale',-1,3,48.0,110.0,'POS-076',NULL,'2026-11-08 15:28:36');
+INSERT INTO stock_movements VALUES(367,19,'sale',-1,9,18.0,45.0,'POS-076',NULL,'2026-11-08 15:28:36');
+INSERT INTO stock_movements VALUES(368,6,'sale',-1,7,48.0,110.0,'POS-077',NULL,'2026-11-09 14:28:36');
+INSERT INTO stock_movements VALUES(369,11,'sale',-1,3,48.0,110.0,'POS-077',NULL,'2026-11-09 14:28:36');
+INSERT INTO stock_movements VALUES(370,41,'sale',-1,9,15.0,39.0,'POS-077',NULL,'2026-11-09 14:28:36');
+INSERT INTO stock_movements VALUES(371,3,'sale',-1,0,48.0,110.0,'POS-078',NULL,'2026-11-10 13:28:36');
+INSERT INTO stock_movements VALUES(372,7,'sale',-1,6,48.0,110.0,'POS-078',NULL,'2026-11-10 13:28:36');
+INSERT INTO stock_movements VALUES(373,12,'sale',-1,10,48.0,110.0,'POS-078',NULL,'2026-11-10 13:28:36');
+INSERT INTO stock_movements VALUES(374,25,'sale',-1,12,18.0,45.0,'POS-078',NULL,'2026-11-10 13:28:36');
+INSERT INTO stock_movements VALUES(375,50,'sale',-1,3,15.0,39.0,'POS-078',NULL,'2026-11-10 13:28:36');
+INSERT INTO stock_movements VALUES(376,20,'sale',-1,15,18.0,45.0,'POS-079',NULL,'2026-11-11 11:28:36');
+INSERT INTO stock_movements VALUES(377,40,'sale',-1,7,15.0,39.0,'POS-079',NULL,'2026-11-11 11:28:36');
+INSERT INTO stock_movements VALUES(378,44,'sale',-1,9,15.0,39.0,'POS-079',NULL,'2026-11-11 11:28:36');
+INSERT INTO stock_movements VALUES(379,45,'sale',-1,11,15.0,39.0,'POS-079',NULL,'2026-11-11 11:28:36');
+INSERT INTO stock_movements VALUES(380,51,'sale',-1,9,15.0,39.0,'POS-079',NULL,'2026-11-11 11:28:36');
+INSERT INTO stock_movements VALUES(381,15,'sale',-1,1,48.0,110.0,'POS-080',NULL,'2026-11-12 08:28:36');
+INSERT INTO stock_movements VALUES(382,24,'sale',-1,11,18.0,45.0,'POS-080',NULL,'2026-11-12 08:28:36');
+INSERT INTO stock_movements VALUES(383,39,'sale',-1,6,15.0,39.0,'POS-080',NULL,'2026-11-12 08:28:36');
+INSERT INTO stock_movements VALUES(384,11,'sale',-1,2,48.0,110.0,'POS-081',NULL,'2026-11-13 16:28:36');
+INSERT INTO stock_movements VALUES(385,40,'sale',-1,6,15.0,39.0,'POS-081',NULL,'2026-11-13 16:28:36');
+INSERT INTO stock_movements VALUES(386,49,'sale',-1,15,15.0,39.0,'POS-081',NULL,'2026-11-13 16:28:36');
+INSERT INTO stock_movements VALUES(387,50,'sale',-1,2,15.0,39.0,'POS-081',NULL,'2026-11-13 16:28:36');
+INSERT INTO stock_movements VALUES(388,12,'sale',-1,9,48.0,110.0,'POS-082',NULL,'2026-11-14 06:28:36');
+INSERT INTO stock_movements VALUES(389,18,'sale',-1,7,18.0,45.0,'POS-082',NULL,'2026-11-14 06:28:36');
+INSERT INTO stock_movements VALUES(390,25,'sale',-1,11,18.0,45.0,'POS-082',NULL,'2026-11-14 06:28:36');
+INSERT INTO stock_movements VALUES(391,17,'sale',-1,5,18.0,45.0,'POS-083',NULL,'2026-11-15 11:28:36');
+INSERT INTO stock_movements VALUES(392,17,'return',1,6,18.0,45.0,'RET-083','wrong size','2026-11-15 11:28:36');
+INSERT INTO stock_movements VALUES(393,19,'sale',-1,8,18.0,45.0,'POS-083',NULL,'2026-11-15 11:28:36');
+INSERT INTO stock_movements VALUES(394,21,'sale',-1,3,18.0,45.0,'POS-083',NULL,'2026-11-15 11:28:36');
+INSERT INTO stock_movements VALUES(395,49,'sale',-1,14,15.0,39.0,'POS-083',NULL,'2026-11-15 11:28:36');
+INSERT INTO stock_movements VALUES(396,50,'sale',-1,1,15.0,39.0,'POS-083',NULL,'2026-11-15 11:28:36');
+INSERT INTO stock_movements VALUES(397,6,'sale',-1,6,48.0,110.0,'POS-084',NULL,'2026-11-16 06:28:36');
+INSERT INTO stock_movements VALUES(398,12,'sale',-1,8,48.0,110.0,'POS-084',NULL,'2026-11-16 06:28:36');
+INSERT INTO stock_movements VALUES(399,48,'sale',-1,11,15.0,39.0,'POS-084',NULL,'2026-11-16 06:28:36');
+INSERT INTO stock_movements VALUES(400,1,'sale',-1,11,48.0,110.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(401,7,'sale',-1,5,48.0,110.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(402,12,'sale',-1,7,48.0,110.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(403,17,'sale',-1,5,18.0,45.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(404,20,'sale',-1,14,18.0,45.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(405,32,'sale',-1,3,70.0,165.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(406,38,'sale',-1,5,15.0,39.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(407,43,'sale',-1,8,15.0,39.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(408,48,'sale',-1,10,15.0,39.0,'POS-085',NULL,'2026-11-17 16:28:36');
+INSERT INTO stock_movements VALUES(409,4,'sale',-1,3,48.0,110.0,'POS-086',NULL,'2026-11-18 14:28:36');
+INSERT INTO stock_movements VALUES(410,8,'sale',-1,2,48.0,110.0,'POS-086',NULL,'2026-11-18 14:28:36');
+INSERT INTO stock_movements VALUES(411,38,'sale',-1,4,15.0,39.0,'POS-087',NULL,'2026-11-19 14:28:36');
+INSERT INTO stock_movements VALUES(412,10,'sale',-1,9,48.0,110.0,'POS-088',NULL,'2026-11-20 06:28:36');
+INSERT INTO stock_movements VALUES(413,17,'sale',-1,4,18.0,45.0,'POS-088',NULL,'2026-11-20 06:28:36');
+INSERT INTO stock_movements VALUES(414,40,'sale',-1,5,15.0,39.0,'POS-088',NULL,'2026-11-20 06:28:36');
+INSERT INTO stock_movements VALUES(415,13,'sale',-1,6,48.0,110.0,'POS-089',NULL,'2026-11-21 16:28:36');
+INSERT INTO stock_movements VALUES(416,29,'sale',-1,13,70.0,165.0,'POS-089',NULL,'2026-11-21 16:28:36');
+INSERT INTO stock_movements VALUES(417,41,'sale',-1,8,15.0,39.0,'POS-089',NULL,'2026-11-21 16:28:36');
+INSERT INTO stock_movements VALUES(418,43,'sale',-1,7,15.0,39.0,'POS-089',NULL,'2026-11-21 16:28:36');
+INSERT INTO stock_movements VALUES(419,48,'sale',-1,9,15.0,39.0,'POS-089',NULL,'2026-11-21 16:28:36');
+INSERT INTO stock_movements VALUES(420,3,'receipt',9,9,48.0,NULL,'PO-20261121-001','PO receipt','2026-11-21 21:28:46');
+INSERT INTO stock_movements VALUES(421,15,'receipt',8,9,48.0,NULL,'PO-20261121-001','PO receipt','2026-11-21 21:28:46');
+INSERT INTO stock_movements VALUES(422,3,'sale',-2,7,48.0,110.0,'POS-5001',NULL,'2026-11-21 21:28:46');
+INSERT INTO stock_movements VALUES(423,20,'return',1,15,18.0,45.0,NULL,'too small','2026-11-21 21:28:46');
+INSERT INTO stock_movements VALUES(424,33,'damage',-1,9,70.0,NULL,NULL,'box crushed in transit','2026-11-21 21:28:46');
+INSERT INTO stock_movements VALUES(425,39,'count',1,7,15.0,NULL,NULL,'Nov stock take','2026-11-21 21:28:46');
+INSERT INTO stock_movements VALUES(426,5,'sale',-2,0,48.0,110.0,'POS-DEMO-1',NULL,'2026-11-21 21:34:25');
+INSERT INTO stock_movements VALUES(427,39,'sale',-1,6,15.0,39.0,'POS-DEMO-1',NULL,'2026-11-21 21:34:25');
+CREATE TABLE purchase_orders (
+    id             INTEGER PRIMARY KEY,
+    po_number      TEXT NOT NULL UNIQUE,
+    supplier_id    INTEGER NOT NULL REFERENCES suppliers(id),
+    status         TEXT NOT NULL DEFAULT 'draft' CHECK (status IN
+                   ('draft','ordered','partial','received','cancelled')),
+    expected_date  TEXT,
+    notes          TEXT,
+    created_at     TEXT NOT NULL DEFAULT (datetime('now')),
+    updated_at     TEXT NOT NULL DEFAULT (datetime('now'))
+);
+INSERT INTO purchase_orders VALUES(1,'PO-20261121-001',1,'partial','2026-12-01','Auto-generated from reorder alerts','2026-11-21 21:28:46','2026-11-21 21:28:46');
+INSERT INTO purchase_orders VALUES(2,'PO-20261121-002',2,'draft','2026-12-12','Auto-generated from reorder alerts','2026-11-21 21:28:46','2026-11-21 21:28:46');
+CREATE TABLE po_items (
+    id            INTEGER PRIMARY KEY,
+    po_id         INTEGER NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
+    variant_id    INTEGER NOT NULL REFERENCES variants(id),
+    qty_ordered   INTEGER NOT NULL CHECK (qty_ordered > 0),
+    qty_received  INTEGER NOT NULL DEFAULT 0,
+    unit_cost     REAL NOT NULL DEFAULT 0,
+    UNIQUE (po_id, variant_id)
+);
+INSERT INTO po_items VALUES(1,1,3,9,9,48.0);
+INSERT INTO po_items VALUES(2,1,14,9,0,48.0);
+INSERT INTO po_items VALUES(3,1,15,12,8,48.0);
+INSERT INTO po_items VALUES(4,1,4,6,0,48.0);
+INSERT INTO po_items VALUES(5,1,5,7,0,48.0);
+INSERT INTO po_items VALUES(6,1,21,6,0,18.0);
+INSERT INTO po_items VALUES(7,1,23,6,0,18.0);
+INSERT INTO po_items VALUES(8,1,8,7,0,48.0);
+INSERT INTO po_items VALUES(9,1,11,7,0,48.0);
+INSERT INTO po_items VALUES(10,1,16,7,0,48.0);
+INSERT INTO po_items VALUES(11,2,50,9,0,15.0);
+INSERT INTO po_items VALUES(12,2,32,6,0,70.0);
+INSERT INTO po_items VALUES(13,2,31,7,0,70.0);
+INSERT INTO po_items VALUES(14,2,42,6,0,15.0);
+CREATE INDEX idx_mov_variant ON stock_movements(variant_id, created_at);
+CREATE INDEX idx_mov_type ON stock_movements(movement_type, created_at);
+COMMIT;
